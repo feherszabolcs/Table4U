@@ -1,0 +1,104 @@
+﻿@page "/reservations/edit"
+@using Microsoft.EntityFrameworkCore
+@using Table4U
+@inject IDbContextFactory<Table4U.Data.Table4UContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Reservation</h2>
+<hr />
+@if (Reservation is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Reservation" OnValidSubmit="UpdateReservation" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Reservation.Id" value="@Reservation.Id" />
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name:</label>
+                    <InputText id="name" @bind-Value="Reservation.Name" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Reservation.Name" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="date" class="form-label">Date:</label>
+                    <InputDate id="date" @bind-Value="Reservation.Date" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Reservation.Date" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="peoplecount" class="form-label">PeopleCount:</label>
+                    <InputNumber id="peoplecount" @bind-Value="Reservation.PeopleCount" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Reservation.PeopleCount" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="tableid" class="form-label">TableId:</label>
+                    <InputNumber id="tableid" @bind-Value="Reservation.TableId" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Reservation.TableId" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/reservations">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private Reservation? Reservation { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Reservation ??= await context.Reservation.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Reservation is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateReservation()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Reservation!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!ReservationExists(Reservation!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/reservations");
+    }
+
+    private bool ReservationExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Reservation.Any(e => e.Id == id);
+    }
+}

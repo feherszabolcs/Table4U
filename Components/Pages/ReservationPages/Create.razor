@@ -1,0 +1,59 @@
+﻿@page "/reservations/create"
+@using Microsoft.EntityFrameworkCore
+@using Table4U
+@inject IDbContextFactory<Table4U.Data.Table4UContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Reservation</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Reservation" OnValidSubmit="AddReservation" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="name" class="form-label">Name:</label> 
+                <InputText id="name" @bind-Value="Reservation.Name" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Reservation.Name" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="date" class="form-label">Date:</label> 
+                <InputDate id="date" @bind-Value="Reservation.Date" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Reservation.Date" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="peoplecount" class="form-label">PeopleCount:</label> 
+                <InputNumber id="peoplecount" @bind-Value="Reservation.PeopleCount" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Reservation.PeopleCount" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="tableid" class="form-label">TableId:</label> 
+                <InputNumber id="tableid" @bind-Value="Reservation.TableId" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Reservation.TableId" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/reservations">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Reservation Reservation { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddReservation()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Reservation.Add(Reservation);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/reservations");
+    }
+}

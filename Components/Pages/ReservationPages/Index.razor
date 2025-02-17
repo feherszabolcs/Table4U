@@ -1,0 +1,39 @@
+﻿@page "/reservations"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Table4U
+@using Table4U.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<Table4U.Data.Table4UContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="reservations/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Reservation">
+    <PropertyColumn Property="reservation => reservation.Name" />
+    <PropertyColumn Property="reservation => reservation.Date" />
+    <PropertyColumn Property="reservation => reservation.PeopleCount" />
+    <PropertyColumn Property="reservation => reservation.TableId" />
+
+    <TemplateColumn Context="reservation">
+        <a href="@($"reservations/edit?id={reservation.Id}")">Edit</a> |
+        <a href="@($"reservations/details?id={reservation.Id}")">Details</a> |
+        <a href="@($"reservations/delete?id={reservation.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private Table4UContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}
