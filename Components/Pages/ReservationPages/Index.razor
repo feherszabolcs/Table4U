@@ -6,19 +6,19 @@
 @implements IAsyncDisposable
 @inject IDbContextFactory<Table4U.Data.Table4UContext> DbFactory
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Reservations</PageTitle>
 
-<h1>Index</h1>
+<h1>Reservation</h1>
 
 <p>
-    <a href="reservations/create">Create New</a>
+    <a href="reservations/create">Record reservation</a>
 </p>
 
 <QuickGrid Class="table" Items="context.Reservation">
-    <PropertyColumn Property="reservation => reservation.Name" />
-    <PropertyColumn Property="reservation => reservation.Date" />
-    <PropertyColumn Property="reservation => reservation.PeopleCount" />
-    <PropertyColumn Property="reservation => reservation.TableId" />
+    <PropertyColumn Property="reservation => reservation.Name" Sortable="true"/>
+    <PropertyColumn Property="reservation => reservation.Date" Sortable="true"/>
+    <PropertyColumn Property="reservation => reservation.PeopleCount" Sortable="true"/>
+    <PropertyColumn Property="reservation => reservation.TableId" Sortable="true"/>
 
     <TemplateColumn Context="reservation">
         <a href="@($"reservations/edit?id={reservation.Id}")">Edit</a> |

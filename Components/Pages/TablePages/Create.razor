@@ -1,0 +1,58 @@
+﻿@page "/tables/create"
+@using Microsoft.EntityFrameworkCore
+@using Table4U
+@inject IDbContextFactory<Table4U.Data.Table4UContext> DbFactory
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<PageTitle>New Table</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Table</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" EditContext="@editContext" OnValidSubmit="AddTable" FormName="createTable" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="slot" class="form-label">Slot:</label> 
+                <InputNumber id="slot" @bind-Value="Table.Slot" class="form-control" aria-required="true"/> 
+                <ValidationMessage For="() => Table.Slot" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="isreserved" class="form-label">IsReserved:</label> 
+                <InputCheckbox id="isreserved" @bind-Value="Table.IsReserved" class="form-check-input" aria-required="true"/> 
+                <ValidationMessage For="() => Table.IsReserved" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/tables">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm(FormName = "createTable")]
+    public Table? Table { get; set; }
+    private EditContext? editContext;
+
+
+    protected override void OnInitialized()
+    {
+        Table ??= new();
+        editContext = new(Table);
+    }
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddTable()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Table.Add(Table);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/tables");
+    }
+}

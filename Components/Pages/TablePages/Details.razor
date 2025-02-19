@@ -1,0 +1,48 @@
+﻿@page "/tables/details"
+@using Microsoft.EntityFrameworkCore
+@using Table4U
+@inject IDbContextFactory<Table4U.Data.Table4UContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Table</h2>
+    <hr />
+    @if (table is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Slot</dt>
+            <dd class="col-sm-10">@table.Slot</dd>
+            <dt class="col-sm-2">IsReserved</dt>
+            <dd class="col-sm-10">@table.IsReserved</dd>
+        </dl>
+        <div>
+            <a href="@($"/tables/edit?id={table.Id}")">Edit</a> |
+            <a href="@($"/tables")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Table? table;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        table = await context.Table.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (table is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

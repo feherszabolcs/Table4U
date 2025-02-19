@@ -15,5 +15,6 @@ namespace Table4U.Data
         }
 
         public DbSet<Table4U.Reservation> Reservation { get; set; } = default!;
+        public DbSet<Table4U.Table> Table { get; set; } = default!;
     }
 }

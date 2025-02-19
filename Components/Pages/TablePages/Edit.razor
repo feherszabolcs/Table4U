@@ -1,0 +1,95 @@
+﻿@page "/tables/edit"
+@using Microsoft.EntityFrameworkCore
+@using Table4U
+@inject IDbContextFactory<Table4U.Data.Table4UContext> DbFactory
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Table</h2>
+<hr />
+@if (Table is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Table" OnValidSubmit="UpdateTable" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Table.Id" value="@Table.Id" />
+                <div class="mb-3">
+                    <label for="slot" class="form-label">Slot:</label>
+                    <InputNumber id="slot" @bind-Value="Table.Slot" class="form-control" aria-required="true"/>
+                    <ValidationMessage For="() => Table.Slot" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="isreserved" class="form-label">IsReserved:</label>
+                    <InputCheckbox id="isreserved" @bind-Value="Table.IsReserved" class="form-check-input" aria-required="true"/>
+                    <ValidationMessage For="() => Table.IsReserved" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/tables">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private Table? Table { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Table ??= await context.Table.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Table is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateTable()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Table!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!TableExists(Table!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/tables");
+    }
+
+    private bool TableExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Table.Any(e => e.Id == id);
+    }
+}
