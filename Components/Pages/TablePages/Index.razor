@@ -19,24 +19,29 @@
 {
     <p>Loading...</p>
 }
+else
+{
+    <QuickGrid Class="table" Items="context?.Table">
+        <PropertyColumn Property="table => table.Id" class="align-content-center justify-content-center" />
+        <PropertyColumn Property="table => table.Slot" class="align-content-center justify-content-center" />
+        <PropertyColumn Property="table => table.IsReserved" class="align-content-center justify-content-center" />
 
-<QuickGrid Class="table" Items="context.Table">
-    <PropertyColumn Property="table => table.Id" class="align-content-center justify-content-center" />
-    <PropertyColumn Property="table => table.Slot" class="align-content-center justify-content-center" />
-    <PropertyColumn Property="table => table.IsReserved" class="align-content-center justify-content-center" />
+        <TemplateColumn Context="table">
+            <a class="btn btn-primary mx-2" href="@($"tables/edit?id={table.Id}")">Edit</a>
+            <a class="btn btn-success mx-2" href="@($"tables/details?id={table.Id}")">Details</a>
+            <a class="btn btn-danger mx-2" href="@($"tables/delete?id={table.Id}")">Delete</a>
+        </TemplateColumn>
+    </QuickGrid>
+}
 
-    <TemplateColumn Context="table">
-        <a class="btn btn-primary mx-2" href="@($"tables/edit?id={table.Id}")">Edit</a> 
-        <a class="btn btn-success mx-2" href="@($"tables/details?id={table.Id}")">Details</a> 
-        <a class="btn btn-danger mx-2" href="@($"tables/delete?id={table.Id}")">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
+
 
 @code {
     Table4UContext context = default!;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        await Task.Delay(1);
         context = DbFactory.CreateDbContext();
     }
 

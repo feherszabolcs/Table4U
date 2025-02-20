@@ -5,35 +5,44 @@
 @using Table4U.Data
 @implements IAsyncDisposable
 @inject IDbContextFactory<Table4U.Data.Table4UContext> DbFactory
-@attribute [StreamRendering]
+@attribute [StreamRendering(true)]
 
 <PageTitle>Reservations</PageTitle>
 
 <h1>Reservation</h1>
 
-<p>
-    <a href="reservations/create">Record reservation</a>
-</p>
+<a class="my-3" href="reservations/create"><span class="bi bi-plus-square-fill" aria-hidden="true"></span></a>
 
-<QuickGrid Class="table" Items="context.Reservation">
-    <PropertyColumn Property="reservation => reservation.Name" Sortable="true"/>
-    <PropertyColumn Property="reservation => reservation.Date" Sortable="true"/>
-    <PropertyColumn Property="reservation => reservation.PeopleCount" Sortable="true"/>
-    <PropertyColumn Property="reservation => reservation.TableId" Sortable="true"/>
+@if (context == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <QuickGrid Class="table" Items="context?.Reservation">
+        <PropertyColumn Property="reservation => reservation.Name" Sortable="true" class="align-content-center justify-content-center" />
+        <PropertyColumn Property="reservation => reservation.Date" Sortable="true" class="align-content-center justify-content-center" />
+        <PropertyColumn Property="reservation => reservation.PeopleCount" Sortable="true" class="align-content-center justify-content-center" />
+        <PropertyColumn Property="reservation => reservation.TableId" Sortable="true" class="align-content-center justify-content-center" />
 
-    <TemplateColumn Context="reservation">
-        <a href="@($"reservations/edit?id={reservation.Id}")">Edit</a> |
-        <a href="@($"reservations/details?id={reservation.Id}")">Details</a> |
-        <a href="@($"reservations/delete?id={reservation.Id}")">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
+        <TemplateColumn Context="reservation">
+            <a class="btn btn-primary mx-2" href="@($"reservations/edit?id={reservation.Id}")">Edit</a> |
+            <a class="btn btn-success mx-2" href="@($"reservations/details?id={reservation.Id}")">Details</a> |
+            <a class="btn btn-danger mx-2" href="@($"reservations/delete?id={reservation.Id}")">Delete</a>
+        </TemplateColumn>
+    </QuickGrid>
+}
+
+
 
 @code {
     private Table4UContext context = default!;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        await Task.Delay(1);
         context = DbFactory.CreateDbContext();
+
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
