@@ -47,11 +47,6 @@ namespace Table4U.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_Reservation_TableId",
-                table: "Reservation",
-                column: "TableId",
-                unique: true);
         }
 
         /// <inheritdoc />

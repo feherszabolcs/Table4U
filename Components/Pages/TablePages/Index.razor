@@ -6,16 +6,23 @@
 @implements IAsyncDisposable
 @inject IDbContextFactory<Table4U.Data.Table4UContext> DbFactory
 @attribute [StreamRendering]
+@rendermode InteractiveServer
 
 <PageTitle>Tables</PageTitle>
 
 <h1>Tables</h1>
 
     
-    <a class="my-3" href="tables/create"><span class="bi bi-plus-square-fill" aria-hidden="true"></span></a>
+<a class="my-3" href="tables/create"><span class="bi bi-plus-square-fill" aria-hidden="true"></span></a>
+
+@if (context == null)
+{
+    <p>Loading...</p>
+}
 
 <QuickGrid Class="table" Items="context.Table">
-    <PropertyColumn Property="table => table.Slot" class="align-content-center justify-content-center"/>
+    <PropertyColumn Property="table => table.Id" class="align-content-center justify-content-center" />
+    <PropertyColumn Property="table => table.Slot" class="align-content-center justify-content-center" />
     <PropertyColumn Property="table => table.IsReserved" class="align-content-center justify-content-center" />
 
     <TemplateColumn Context="table">
@@ -26,7 +33,7 @@
 </QuickGrid>
 
 @code {
-    private Table4UContext context = default!;
+    Table4UContext context = default!;
 
     protected override void OnInitialized()
     {

@@ -1,6 +1,7 @@
 ﻿@page "/reservations/create"
 @using Microsoft.EntityFrameworkCore
 @using Table4U
+@using Table4U.Data
 @inject IDbContextFactory<Table4U.Data.Table4UContext> DbFactory
 @inject NavigationManager NavigationManager
 
@@ -32,28 +33,41 @@
             </div>        
             <div class="mb-3">
                 <label for="tableid" class="form-label">TableId:</label> 
-                <InputNumber id="tableid" @bind-Value="Reservation.TableId" class="form-control" aria-required="true"/> 
+                <InputSelect id="tableid" @bind-Value="Reservation.TableId" class="form-control" aria-required="true">
+                    @foreach (var item in tables)
+                    {
+                        <option value="@item.Id">@item.Id</option>
+                    }
+                </InputSelect>
                 <ValidationMessage For="() => Reservation.TableId" class="text-danger" /> 
             </div>        
-            <button type="submit" class="btn btn-primary">Create</button>
+            <div>
+            <button type="submit" class="btn btn-success">Create</button>
+                <a class="btn btn-primary" href="/reservations">Back to List</a>
+            </div>
         </EditForm>
     </div>
 </div>
 
-<div>
-    <a href="/reservations">Back to List</a>
-</div>
+
 
 @code {
     [SupplyParameterFromForm]
     private Reservation Reservation { get; set; } = new();
+    private Table4UContext context = default!;
+    List<Table> tables = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+        tables = context.Table.ToList();
+    }
 
     // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddReservation()
     {
-        using var context = DbFactory.CreateDbContext();
-        context.Reservation.Add(Reservation);
-        await context.SaveChangesAsync();
-        NavigationManager.NavigateTo("/reservations");
-    }
+		context.Reservation.Add(Reservation);
+		await context.SaveChangesAsync();
+		NavigationManager.NavigateTo("/reservations");
+	}
 }
