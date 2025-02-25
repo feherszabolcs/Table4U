@@ -6,6 +6,7 @@
 @implements IAsyncDisposable
 @inject IDbContextFactory<Table4U.Data.Table4UContext> DbFactory
 @attribute [StreamRendering(true)]
+@rendermode InteractiveServer
 
 <PageTitle>Reservations</PageTitle>
 
@@ -19,7 +20,7 @@
 }
 else
 {
-    <QuickGrid Class="table" Items="context?.Reservation">
+    <QuickGrid Class="table" Items="reservationsList">
         <PropertyColumn Property="reservation => reservation.Name" Sortable="true" class="align-content-center justify-content-center" />
         <PropertyColumn Property="reservation => reservation.Date" Format="yyyy.MM.dd" Sortable="true" class="align-content-center justify-content-center" />
         <PropertyColumn Property="reservation => reservation.Time" Sortable="true" class="align-content-center justify-content-center" />
@@ -29,22 +30,51 @@ else
         <TemplateColumn Context="reservation">
             <a class="btn btn-primary mx-2" href="@($"reservations/edit?id={reservation.Id}")">Edit</a> |
             <a class="btn btn-success mx-2" href="@($"reservations/details?id={reservation.Id}")">Details</a> |
-            <a class="btn btn-danger mx-2" href="@($"reservations/delete?id={reservation.Id}")">Delete</a>
+            <Button class="btn btn-danger mx-2" @onclick="(args) => onDelete(args, reservation)">Delete</Button>
         </TemplateColumn>
     </QuickGrid>
 }
-
-
+<ConfirmDialog @ref="confirmDialog" />
 
 @code {
-    private Table4UContext context = default!;
 
-    protected override async Task OnInitializedAsync()
-    {
-        await Task.Delay(1);
-        context = DbFactory.CreateDbContext();
+	private Table4UContext context = default!;
+	private IQueryable<Reservation> reservationsList;
 
-    }
+	private ConfirmDialog confirmDialog = default!;
+	Reservation reservation { get; set; } = new();
 
-    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+
+	protected override async Task OnInitializedAsync()
+	{
+		await Task.Delay(1);
+		context = DbFactory.CreateDbContext();
+		reservationsList = context.Reservation;
+
+	}
+
+	public async ValueTask DisposeAsync() => await context.DisposeAsync();
+
+	private async void onDelete(EventArgs e, Reservation res)
+	{
+		reservation = res;
+		await ShowDialogAsync();
+		StateHasChanged();
+	}
+
+	private async Task ShowDialogAsync()
+	{
+		var confirmation = await confirmDialog.ShowAsync(
+			title: $"Confirm deleting {reservation?.Name}'s reservation",
+			message1: "Once the record is deleted, it can not be rolled back."
+		);
+
+		if (confirmation)
+		{
+			using var context = DbFactory.CreateDbContext();
+			context.Reservation.Remove(reservation!);
+			reservationsList = reservationsList.Where(r => r.Id != reservation!.Id);
+			await context.SaveChangesAsync();
+		}
+	}
 }

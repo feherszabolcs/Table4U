@@ -32,6 +32,11 @@ else
                     <InputDate id="date" @bind-Value="Reservation.Date" class="form-control" aria-required="true"/>
                     <ValidationMessage For="() => Reservation.Date" class="text-danger" />
                 </div>
+                <div>
+                    <label for="time" class="form-label">Time:</label>
+                    <TimeInput id="time" TValue="TimeOnly" @bind-Value="Reservation.Time"></TimeInput>
+                    <ValidationMessage For="() => Reservation.Date" class="text-danger" />
+                </div>
                 <div class="mb-3">
                     <label for="peoplecount" class="form-label">PeopleCount:</label>
                     <InputNumber id="peoplecount" @bind-Value="Reservation.PeopleCount" class="form-control" aria-required="true"/>

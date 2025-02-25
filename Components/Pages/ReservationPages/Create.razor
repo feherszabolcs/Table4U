@@ -29,8 +29,7 @@
             <div>
                 <label for="time" class="form-label">Time:</label>
                 <TimeInput id="time" TValue="TimeOnly" @bind-Value="Reservation.Time"></TimeInput>
-                <label>@Reservation.Time</label>
-                @* <ValidationMessage For="() => Reservation.Date" class="text-danger" /> *@
+                <ValidationMessage For="() => Reservation.Date" class="text-danger" />
             </div>
             <div class="mb-3">
                 <label for="peoplecount" class="form-label">PeopleCount:</label> 
