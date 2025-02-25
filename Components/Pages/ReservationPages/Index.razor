@@ -21,7 +21,8 @@ else
 {
     <QuickGrid Class="table" Items="context?.Reservation">
         <PropertyColumn Property="reservation => reservation.Name" Sortable="true" class="align-content-center justify-content-center" />
-        <PropertyColumn Property="reservation => reservation.Date" Sortable="true" class="align-content-center justify-content-center" />
+        <PropertyColumn Property="reservation => reservation.Date" Format="yyyy.MM.dd" Sortable="true" class="align-content-center justify-content-center" />
+        <PropertyColumn Property="reservation => reservation.Time" Sortable="true" class="align-content-center justify-content-center" />
         <PropertyColumn Property="reservation => reservation.PeopleCount" Sortable="true" class="align-content-center justify-content-center" />
         <PropertyColumn Property="reservation => reservation.TableId" Sortable="true" class="align-content-center justify-content-center" />
 

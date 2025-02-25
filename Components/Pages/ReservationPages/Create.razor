@@ -4,6 +4,7 @@
 @using Table4U.Data
 @inject IDbContextFactory<Table4U.Data.Table4UContext> DbFactory
 @inject NavigationManager NavigationManager
+@rendermode InteractiveServer
 
 <PageTitle>New reservation</PageTitle>
 
@@ -15,7 +16,6 @@
     <div class="col-md-4">
         <EditForm method="post" Model="Reservation" OnValidSubmit="AddReservation" FormName="create" Enhance>
             <DataAnnotationsValidator />
-            <ValidationSummary class="text-danger" role="alert"/>
             <div class="mb-3">
                 <label for="name" class="form-label">Name:</label> 
                 <InputText id="name" @bind-Value="Reservation.Name" class="form-control" aria-required="true"/> 
@@ -23,9 +23,15 @@
             </div>        
             <div class="mb-3">
                 <label for="date" class="form-label">Date:</label> 
-                <InputDate id="date" @bind-Value="Reservation.Date" class="form-control" aria-required="true"/> 
+                <InputDate id="date" @bind-Value="Reservation.Date" class="form-control" aria-required="true" Format="YYYY.MM.dd"/> 
                 <ValidationMessage For="() => Reservation.Date" class="text-danger" /> 
-            </div>        
+            </div>    
+            <div>
+                <label for="time" class="form-label">Time:</label>
+                <TimeInput id="time" TValue="TimeOnly" @bind-Value="Reservation.Time"></TimeInput>
+                <label>@Reservation.Time</label>
+                @* <ValidationMessage For="() => Reservation.Date" class="text-danger" /> *@
+            </div>
             <div class="mb-3">
                 <label for="peoplecount" class="form-label">PeopleCount:</label> 
                 <InputNumber id="peoplecount" @bind-Value="Reservation.PeopleCount" class="form-control" aria-required="true"/> 
@@ -59,6 +65,8 @@
 
     protected override void OnInitialized()
     {
+        Reservation.Date = DateTime.Now;
+        Reservation.Time = new();
         context = DbFactory.CreateDbContext();
         tables = context.Table.ToList();
     }
@@ -66,7 +74,7 @@
     // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddReservation()
     {
-		context.Reservation.Add(Reservation);
+        context.Reservation.Add(Reservation);
 		await context.SaveChangesAsync();
 		NavigationManager.NavigateTo("/reservations");
 	}

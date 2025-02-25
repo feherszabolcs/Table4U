@@ -12,6 +12,8 @@ namespace Table4U
         [Required]
         public DateTime Date { get; set; }
         [Required]
+        public TimeOnly Time { get; set; }
+        [Required]
         public int PeopleCount { get; set; }
         [Required]
         public int TableId { get; set; }
