@@ -6,7 +6,6 @@
 @implements IAsyncDisposable
 @inject IDbContextFactory<Table4U.Data.Table4UContext> DbFactory
 @attribute [StreamRendering]
-@rendermode InteractiveServer
 
 <PageTitle>Tables</PageTitle>
 
@@ -21,7 +20,7 @@
 }
 else
 {
-    <QuickGrid Class="table" Items="context?.Table">
+    <QuickGrid Class="table" Items="tableList">
         <PropertyColumn Property="table => table.Id" class="align-content-center justify-content-center" />
         <PropertyColumn Property="table => table.Slot" class="align-content-center justify-content-center" />
         <PropertyColumn Property="table => table.IsReserved" class="align-content-center justify-content-center" />
@@ -29,21 +28,48 @@ else
         <TemplateColumn Context="table">
             <a class="btn btn-primary mx-2" href="@($"tables/edit?id={table.Id}")">Edit</a>
             <a class="btn btn-success mx-2" href="@($"tables/details?id={table.Id}")">Details</a>
-            <a class="btn btn-danger mx-2" href="@($"tables/delete?id={table.Id}")">Delete</a>
+            <Button @onclick="(args) => onDelete(args, table)" class="btn btn-danger mx-2">Delete</Button>
         </TemplateColumn>
     </QuickGrid>
 }
 
-
+<ConfirmDialog @ref="dialog"/>
 
 @code {
     Table4UContext context = default!;
+    private IQueryable<Table> tableList;
+    Table table { get; set; } = new();
+    private ConfirmDialog dialog = new();
 
     protected override async Task OnInitializedAsync()
     {
         await Task.Delay(1);
         context = DbFactory.CreateDbContext();
+        tableList = context.Table;
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
+
+    private async void onDelete(EventArgs e, Table t)
+    {
+        table = t;
+        await ShowDialogAsync();
+        StateHasChanged();
+    }
+
+    private async Task ShowDialogAsync()
+    {
+        var confirmation = await dialog.ShowAsync(
+            title: $"Confirm deleting table with id of {table.Id}",
+            message1: "Once the record is deleted, it can not be rolled back."
+        );
+
+        if (confirmation)
+        {
+            using var context = DbFactory.CreateDbContext();
+            context.Table.Remove(table!);
+            tableList = tableList.Where(r => r.Id != table!.Id);
+            await context.SaveChangesAsync();
+        }
+    }
 }

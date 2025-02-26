@@ -39,7 +39,7 @@
             <div class="mb-3">
                 <label for="tableid" class="form-label">TableId:</label> 
                 <InputSelect id="tableid" @bind-Value="Reservation.TableId" class="form-control" aria-required="true">
-                    @foreach (var item in tables)
+                    @foreach (var item in tables.Where(r=> r.Slot >= Reservation.PeopleCount))
                     {
                         <option value="@item.Id">@item.Id</option>
                     }
@@ -47,7 +47,7 @@
                 <ValidationMessage For="() => Reservation.TableId" class="text-danger" /> 
             </div>        
             <div>
-            <button type="submit" class="btn btn-success">Create</button>
+                <button type="submit" class="btn btn-success">Create</button>
                 <a class="btn btn-primary" href="/reservations">Back to List</a>
             </div>
         </EditForm>

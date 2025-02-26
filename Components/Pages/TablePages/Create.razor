@@ -25,15 +25,16 @@
                 <label for="isreserved" class="form-label">IsReserved:</label> 
                 <InputCheckbox id="isreserved" @bind-Value="Table.IsReserved" class="form-check-input" aria-required="true"/> 
                 <ValidationMessage For="() => Table.IsReserved" class="text-danger" /> 
-            </div>        
-            <button type="submit" class="btn btn-primary">Create</button>
+            </div>    
+            <div>
+                <button type="submit" class="btn btn-primary">Create</button>
+                <a class="btn btn-primary" href="/tables">Back to List</a>
+            </div>
         </EditForm>
     </div>
 </div>
 
-<div>
-    <a href="/tables">Back to List</a>
-</div>
+
 
 @code {
     [SupplyParameterFromForm(FormName = "createTable")]
