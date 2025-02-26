@@ -3,13 +3,13 @@
 @using Table4U
 @inject IDbContextFactory<Table4U.Data.Table4UContext> DbFactory
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 
 <PageTitle>Details</PageTitle>
 
 <h1>Details</h1>
 
 <div>
-    <h2>Reservation</h2>
     <hr />
     @if (reservation is null)
     {
@@ -27,8 +27,8 @@
             <dd class="col-sm-10">@reservation.TableId</dd>
         </dl>
         <div>
-            <a href="@($"/reservations/edit?id={reservation.Id}")">Edit</a> |
-            <a href="@($"/reservations")">Back to List</a>
+            <a class="btn btn-primary" href="@($"/reservations/edit?id={reservation.Id}")">Edit</a> |
+            <a onclick="history.back()" class="btn btn-secondary">Back</a>
         </div>
     }
 </div>

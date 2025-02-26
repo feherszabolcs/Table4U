@@ -12,18 +12,6 @@
 <h2>Reservations on this day:</h2>
 
 <div style="display:flex; flex-wrap:wrap">
-
-@* @foreach (var item in reservations.Where(r=> r.Date.Day == DateTime.Now.Day))
-{
-	<Card Style="width:18rem; margin:1rem; flex-wrap:wrap">
-		<CardBody>
-			<CardTitle>@item.Name</CardTitle>
-			<CardSubTitle>at: @item.Time, table: @item.TableId </CardSubTitle>
-			<CardText>For @item.PeopleCount @(item.PeopleCount > 1 ? "people" : "person")</CardText>
-		</CardBody>
-	</Card>
-	} *@
-
 	@foreach (var item in tables)
 	{
 		<Card Style="width:13rem; height:13rem; margin:1rem">
