@@ -5,7 +5,8 @@
 @using Table4U.Data
 @implements IAsyncDisposable
 @inject IDbContextFactory<Table4U.Data.Table4UContext> DbFactory
-@attribute [StreamRendering]
+@attribute [StreamRendering(true)]
+@rendermode InteractiveServer
 
 <PageTitle>Tables</PageTitle>
 
@@ -38,8 +39,9 @@ else
 @code {
     Table4UContext context = default!;
     private IQueryable<Table> tableList;
+
     Table table { get; set; } = new();
-    private ConfirmDialog dialog = new();
+    private ConfirmDialog dialog = default!;
 
     protected override async Task OnInitializedAsync()
     {
