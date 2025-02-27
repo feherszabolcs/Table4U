@@ -15,6 +15,6 @@ namespace Table4U
         public int Slot { get; set; }
         [Required]
         public bool IsReserved { get; set; }
-        public Reservation Reservation { get; set; }
+        //public Reservation Reservation { get; set; }
     }
 }

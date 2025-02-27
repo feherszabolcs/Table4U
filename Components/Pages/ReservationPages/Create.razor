@@ -38,16 +38,18 @@
             </div>        
             <div class="mb-3">
                 <label for="tableid" class="form-label">TableId:</label> 
-                <InputSelect id="tableid" @bind-Value="Reservation.TableId" class="form-control" aria-required="true">
-                    @foreach (var item in tables.Where(r=> r.Slot >= Reservation.PeopleCount))
+                <InputSelect TValue="int" id="tableid" @bind-Value="Reservation.TableId" class="form-control" aria-required="true">
+                    <option selected="selected" value="0">Select something!</option>
+                    @foreach (var item in freeTables(Reservation.Date, Reservation.Time).Where(r => r.Slot >= Reservation.PeopleCount))
                     {
                         <option value="@item.Id">@item.Id</option>
                     }
                 </InputSelect>
-                <ValidationMessage For="() => Reservation.TableId" class="text-danger" /> 
+                <ValidationMessage For="() => Reservation.TableId" class="text-danger" />
+                    <p>@Reservation.TableId</p>
             </div>        
             <div>
-                <button type="submit" class="btn btn-success">Create</button>
+                <button disabled="@(Reservation.TableId == 0 ? true : false)" type="submit" class="btn btn-success">Create</button>
                 <a class="btn btn-secondary" onclick="history.back()">Back</a>
             </div>
         </EditForm>
@@ -60,21 +62,43 @@
     [SupplyParameterFromForm]
     private Reservation Reservation { get; set; } = new();
     private Table4UContext context = default!;
+
+    List<Reservation> reservations = default!;
     List<Table> tables = default!;
 
     protected override void OnInitialized()
     {
-        Reservation.Date = DateTime.Now;
-        Reservation.Time = new();
         context = DbFactory.CreateDbContext();
         tables = context.Table.ToList();
+        reservations = context.Reservation.ToList();
     }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+
 
     // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task AddReservation()
     {
         context.Reservation.Add(Reservation);
-		await context.SaveChangesAsync();
-		NavigationManager.NavigateTo("/reservations");
-	}
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/reservations");
+    }
+    private bool isDateEqual(DateTime t1, DateTime t2) =>
+        t1.Date.Day == t2.Day && t1.Date.Month == t2.Month && t1.Date.Year == t2.Year;
+
+    private HashSet<Table> freeTables(DateTime date, TimeOnly time)
+    {
+        HashSet<Table> freeTables = tables.ToHashSet();
+
+        foreach (var res in reservations)
+        { // az a nap pontosan ÉS 3 órás idősáv
+            if (!(isDateEqual(res.Date, date)) || (res.Time.AddHours(3) <= time || res.Time.AddHours(-3) >= time))
+            {
+                freeTables.Add(tables.FirstOrDefault(r=> r.Id == res.TableId));
+            }
+            else if ((isDateEqual(res.Date, date)) || (res.Time.AddHours(3) >= time || res.Time.AddHours(-3) <= time))
+             freeTables = freeTables.Where(r => r.Id != res.TableId).ToHashSet();
+            }
+        return freeTables;
+    }
 }
