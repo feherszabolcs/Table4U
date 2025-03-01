@@ -46,7 +46,6 @@
                     }
                 </InputSelect>
                 <ValidationMessage For="() => Reservation.TableId" class="text-danger" />
-                    <p>@Reservation.TableId</p>
             </div>        
             <div>
                 <button disabled="@(Reservation.TableId == 0 ? true : false)" type="submit" class="btn btn-success">Create</button>
@@ -71,6 +70,9 @@
         context = DbFactory.CreateDbContext();
         tables = context.Table.ToList();
         reservations = context.Reservation.ToList();
+        Reservation.Date = new DateTime(DateTime.Today.Year,1 ,1);
+        Reservation.Time = TimeOnly.FromDateTime(DateTime.Today);
+        this.StateHasChanged();
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
