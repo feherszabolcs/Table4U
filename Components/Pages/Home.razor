@@ -7,19 +7,25 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Current time: @DateTime.Now</h1>
 
-<h2>Reservations on this day:</h2>
+<div  class="datePick">
+	<h2><a @onclick="prevDate">&larr;</a></h2>
+	<h2 style="font-weight:bold"> @SelectedDay.ToString("yyyy.MM.dd") </h2> 
+	<h2><a @onclick="nextDate"> &rarr;</a></h2>
+
+</div>
+<h3 style="justify-self: center">Reservations on this day:</h3>
+
 
 <div style="display:flex; flex-wrap:wrap">
 	@foreach (var item in tables)
 	{
 		<Card Style="width:13rem; height:13rem; margin:1rem">
 			<CardTitle>Table ID: @item.Id</CardTitle>
-				@foreach (var res in reservations.Where(r=>r.Date.Day == DateTime.Now.Day && (r.TableId == item.Id)))
-				{
+			@foreach (var res in reservations.Where(r=>r.Date.Day == SelectedDay.Day && (r.TableId == item.Id)))
+			{
 				<a class="btn btn-primary my-2 mx-2" href="@($"reservations/details?id={res.Id}")">@res.Name, at: @res.Time</a>
-				}
+			}
 		</Card>
 	}
 </div>
@@ -29,14 +35,26 @@
 	Table4UContext context = default!;
 	private List<Reservation> reservations;
 	private List<Table> tables;
+	private DateTime SelectedDay;
 
 	protected override void OnInitialized()
 	{
 		context = DbFactory.CreateDbContext();
 		reservations = context.Reservation.ToList();
 		tables = context.Table.ToList();
+		SelectedDay = DateTime.Today;
 	}
 
+	private void prevDate(EventArgs e)
+	{
+		this.SelectedDay = SelectedDay.AddDays(-1);
+		StateHasChanged();
+	}
+	private void nextDate(EventArgs e)
+	{
+		this.SelectedDay = SelectedDay.AddDays(1);
+		StateHasChanged();
+	}
 
 	public async ValueTask DisposeAsync() => await context.DisposeAsync();
 

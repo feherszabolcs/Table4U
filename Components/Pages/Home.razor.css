@@ -1,0 +1,10 @@
+﻿
+.datePick{
+    display: flex;
+    align-items: center;
+    justify-self: center;
+}
+.datePick a:hover{
+    cursor: pointer;
+    color: mediumblue;
+}
