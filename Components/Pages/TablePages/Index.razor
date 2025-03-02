@@ -12,7 +12,7 @@
 
 <h1>Tables</h1>
 
-    
+
 <a class="my-3" href="tables/create"><span class="bi bi-plus-square-fill" aria-hidden="true"></span></a>
 
 @if (context == null)
@@ -21,7 +21,7 @@
 }
 else
 {
-    <QuickGrid Class="table" Items="tableList">
+    <QuickGrid Class="table" Items="tableList" Pagination="state">
         <PropertyColumn Property="table => table.Id" class="align-content-center justify-content-center" />
         <PropertyColumn Property="table => table.Slot" class="align-content-center justify-content-center" />
         <PropertyColumn Property="table => table.IsReserved" class="align-content-center justify-content-center" />
@@ -32,6 +32,7 @@ else
             <Button @onclick="(args) => onDelete(args, table)" class="btn btn-danger mx-2">Delete</Button>
         </TemplateColumn>
     </QuickGrid>
+    <Paginator State="state"/>
 }
 
 <ConfirmDialog @ref="dialog"/>
@@ -39,6 +40,7 @@ else
 @code {
     Table4UContext context = default!;
     private IQueryable<Table> tableList;
+    PaginationState state = new PaginationState { ItemsPerPage = 10 };
 
     Table table { get; set; } = new();
     private ConfirmDialog dialog = default!;
