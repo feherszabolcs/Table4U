@@ -20,11 +20,11 @@
 }
 else
 {
-	<QuickGrid Class="table" Items="reservationsList" Pagination="state">
+	<QuickGrid Class="table" Items="reservationsListFiltered" Pagination="state">
 		<PropertyColumn Property="reservation => reservation.Name"  Sortable="true" class="align-content-center justify-content-center" >
 			<ColumnOptions>
 				<div>
-					<input @onchange="Query" value="@namefilter" type="search" autofocus />
+					<input @bind="namefilter" @bind:event="oninput" type="search" autofocus />
 				</div>
 			</ColumnOptions>
 		</PropertyColumn>
@@ -46,8 +46,18 @@ else
 @code {
 
 	private Table4UContext context = default!;
-	private string namefilter = "";
-	private IQueryable<Reservation>? reservationsList;
+	string? namefilter = "";
+	private IQueryable<Reservation> reservationsList;
+	IQueryable<Reservation> reservationsListFiltered
+	{
+		get
+		{
+			var res = reservationsList.AsQueryable();
+			if(!string.IsNullOrEmpty(namefilter))
+				res = res.Where(r => EF.Functions.Like(r.Name, $"%{namefilter}%")).AsQueryable();
+			return res;
+		}
+	}
 	PaginationState state = new PaginationState { ItemsPerPage = 10 };
 
 	private ConfirmDialog confirmDialog = default!;
@@ -58,7 +68,7 @@ else
 	{
 		await Task.Delay(1);
 		context = DbFactory.CreateDbContext();
-		reservationsList = context.Reservation.Where(r => r.Name.Contains(namefilter));
+		reservationsList = context.Reservation;
 	}
 
 	public async ValueTask DisposeAsync() => await context.DisposeAsync();
@@ -85,9 +95,9 @@ else
 			await context.SaveChangesAsync();
 		}
 	}
-	private void Query()
+	private void Query(ChangeEventArgs e)
 	{
-		reservationsList = reservationsList.Where(r => r.Name.Contains(namefilter));
-		this.StateHasChanged();
+		reservationsList = reservationsList.Where(r => r.Name.Contains(e.Value.ToString()));
+		StateHasChanged();
 	}
 }
