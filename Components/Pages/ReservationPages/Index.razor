@@ -12,7 +12,7 @@
 
 <h1>Reservation</h1>
 
-<a class="my-3" href="reservations/create"><span class="bi bi-plus-square-fill" aria-hidden="true"></span></a>
+<a class="my-3 btn btn-primary" href="reservations/create"><span class="bi bi-plus-square-fill" aria-hidden="true"></span>Add new</a>
 
 @if (context == null)
 {
@@ -33,9 +33,9 @@ else
 		<PropertyColumn Property="reservation => reservation.PeopleCount" Sortable="true" class="align-content-center justify-content-center" />
 		<PropertyColumn Property="reservation => reservation.TableId" Sortable="true" class="align-content-center justify-content-center" />
 
-		<TemplateColumn Context="reservation">
-			<a class="btn btn-primary mx-2" href="@($"reservations/edit?id={reservation.Id}")">Edit</a> |
-			<a class="btn btn-success mx-2" href="@($"reservations/details?id={reservation.Id}")">Details</a> |
+		<TemplateColumn Context="reservation" Class="col-justify-end">
+			<a class="btn btn-primary mx-2" href="@($"reservations/edit?id={reservation.Id}")">Edit</a> 
+			<a class="btn btn-success mx-2" href="@($"reservations/details?id={reservation.Id}")">Details</a>
 			<Button class="btn btn-danger mx-2" @onclick="(args) => onDelete(args, reservation)">Delete</Button>
 		</TemplateColumn>
 	</QuickGrid>
@@ -66,7 +66,7 @@ else
 
 	protected override async Task OnInitializedAsync()
 	{
-		await Task.Delay(1);
+		// await Task.Delay(1);
 		context = DbFactory.CreateDbContext();
 		reservationsList = context.Reservation;
 	}
